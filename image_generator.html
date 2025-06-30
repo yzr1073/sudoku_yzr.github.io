@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图片生成工具</title>
+    <link rel="stylesheet" href="/css/work/styles_image_generator.css">
+</head>
+<body>
+<h1>图片生成工具</h1>
+<form id="promptForm">
+    <div class="warning">本工具仅支持英文，请输入英文文本关键词！</div>
+    <div style="text-align: center;">
+      <a href="https://cn.bing.com/search?q=%E5%9C%A8%E7%BA%BF%E7%BF%BB%E8%AF%91&form=ANNTH1&refig=6860066ff0ba4f13a3a184073bfdacb8&pc=CNNDDB&pq=zaixian&pqlth=7&assgl=4&sgcn=%E5%9C%A8%E7%BA%BF%E7%BF%BB%E8%AF%91&qs=SC&sgtpv=SC&smvpcn=0&swbcn=10&sctcn=0&sc=10-7&sp=1&ghc=0&cvid=6860066ff0ba4f13a3a184073bfdacb8&clckatsg=1&hsmssg=0" target="_blank">在线翻译</a>
+    </div>
+    <label for="prompts">输入关键词（多个关键词，用英文逗号分隔）：</label><br>
+    <p>可对图片进行复制</p>
+    <textarea id="prompts" name="prompts"></textarea><br>
+    <button type="submit">生成图片</button>
+</form>
+<a href="/work"><button class="back-button">返回工具主页面</button></a>
+<div id="result"></div>
+<div class="loading" id="loading">
+    <div class="loader"></div>
+</div>
+<div class="enlarged-image-container" id="enlargedImageContainer">
+    <img class="enlarged-image" id="enlargedImage" src="" alt="Enlarged Image">
+</div>
+<div class="custom-dialog" id="initialDialog">
+    <p>正在生成图片大概需要2分钟左右完成，请耐心等待！</p>
+    <button class="dialog-button" onclick="document.getElementById('initialDialog').style.display='none'">好的</button>
+</div>
+<div class="custom-dialog" id="finishDialog">
+    <p>图片已成功生成，点击图片可放大查看！</p>
+    <button class="dialog-button" onclick="document.getElementById('finishDialog').style.display='none'">好的</button>
+</div>
+<div class="custom-dialog" id="errorDialog">
+    <p>该工具脚本现在并未运行，无法生成图片</p>
+    <button class="dialog-button" onclick="document.getElementById('errorDialog').style.display='none'">好的</button>
+</div>
+<script src="/js/work/scripts_image_generator.js"></script>
+</body>
+</html>
