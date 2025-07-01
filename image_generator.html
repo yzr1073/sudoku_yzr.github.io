@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>图片生成工具</title>
     <link rel="stylesheet" href="styles_image_generator.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/work/styles_image_generator.css') }}">
 </head>
 <body>
 <h1>图片生成工具</h1>
@@ -38,5 +39,6 @@
     <button class="dialog-button" onclick="document.getElementById('errorDialog').style.display='none'">好的</button>
 </div>
 <script src="scripts_image_generator.js"></script>
+<script src="{{ url_for('static', filename='js/work/scripts_image_generator.js') }}"></script>
 </body>
 </html>
