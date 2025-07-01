@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图片生成工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .back-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .warning {
+            color: red;
+            margin-bottom: 10px;
+        }
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .enlarged-image-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .enlarged-image {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .custom-dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 3000;
+            width: 300px;
+            min-height: 120px;
+            box-sizing: border-box;
+        }
+        .dialog-button {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>图片生成工具</h1>
+<form id="promptForm">
+    <div class="warning">本工具仅支持英文，请输入英文文本关键词！</div>
+    <div style="text-align: center;">
+        <a href="https://cn.bing.com/search?q=%E5%9C%A8%E7%BA%BF%E7%BF%BB%E8%AF%91&form=ANNTH1&refig=6860066ff0ba4f13a3a184073bfdacb8&pc=CNNDDB&pq=zaixian&pqlth=7&assgl=4&sgcn=%E5%9C%A8%E7%BA%BF%E7%BF%BB%E8%AF%91&qs=SC&sgtpv=SC&smvpcn=0&swbcn=10&sctcn=0&sc=10-7&sp=1&ghc=0&cvid=6860066ff0ba4f13a3a184073bfdacb8&clckatsg=1&hsmssg=0" target="_blank">在线翻译</a>
+    </div>
+    <label for="prompts">输入关键词（多个关键词，用英文逗号分隔）：</label><br>
+    <p>可对图片进行复制</p>
+    <textarea id="prompts" name="prompts"></textarea><br>
+    <button type="submit">生成图片</button>
+</form>
+<a href="/work"><button class="back-button">返回工具主页面</button></a>
+<div id="result"></div>
+<div class="loading" id="loading">
+    <div class="loader"></div>
+</div>
+<div class="enlarged-image-container" id="enlargedImageContainer">
+    <img class="enlarged-image" id="enlargedImage" src="" alt="Enlarged Image">
+</div>
+<div class="custom-dialog" id="initialDialog">
+    <p>正在生成图片，大约需要2分钟左右，请耐心等候！</p>
+    <button class="dialog-button" onclick="document.getElementById('initialDialog').style.display='none'">好的</button>
+</div>
+<div class="custom-dialog" id="finishDialog">
+    <p>图片已经生成完成，请根据自己的需求自行复制图片！</p>
+    <button class="dialog-button" onclick="document.getElementById('finishDialog').style.display='none'">好的</button>
+</div>
+<script>
+    document.getElementById('promptForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            document.getElementById('initialDialog').style.display = 'block';
+            document.getElementById('loading').style.display = 'flex';
+            const prompts = document.getElementById('prompts').value.split(',').map(prompt => prompt.trim()).filter(prompt => prompt!== '');
+            const response = await fetch('http://localhost:5000/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompts })
+            });
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('initialDialog').style.display = 'none';
+            document.getElementById('finishDialog').style.display = 'block';
+            data.image_files.forEach((file, index) => {
+                const img = document.createElement('img');
+                const fileName = file.split('/').pop();
+                img.src = `http://localhost:5000/image/${fileName}`;
+                img.alt = `Generated Image ${index + 1}`;
+
+                const container = document.createElement('div');
+                container.className = 'image-container';
+                img.addEventListener('click', () => {
+                    document.getElementById('enlargedImage').src = img.src;
+                    document.getElementById('enlargedImageContainer').style.display = 'flex';
+                });
+                document.getElementById('enlargedImageContainer').addEventListener('click', () => {
+                    document.getElementById('enlargedImageContainer').style.display = 'none';
+                });
+                container.appendChild(img);
+                resultDiv.appendChild(container);
+            });
+        } catch (error) {
+            console.error('生成图片出错:', error);
+            document.getElementById('loading').style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>
