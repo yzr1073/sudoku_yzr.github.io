@@ -168,12 +168,19 @@
                 const fileName = file.split('/').pop();
                 img.src = `http://192.168.0.181:5000/image/${fileName}`;
                 img.alt = `Generated Image ${index + 1}`;
+                img.onerror = () => {
+                    img.src = '';
+                    img.alt = '图片加载失败';
+                    console.error(`图片 ${fileName} 加载失败`);
+                };
 
                 const container = document.createElement('div');
                 container.className = 'image-container';
                 img.addEventListener('click', () => {
-                    document.getElementById('enlargedImage').src = img.src;
-                    document.getElementById('enlargedImageContainer').style.display = 'flex';
+                    if (img.src) {
+                        document.getElementById('enlargedImage').src = img.src;
+                        document.getElementById('enlargedImageContainer').style.display = 'flex';
+                    }
                 });
                 document.getElementById('enlargedImageContainer').addEventListener('click', () => {
                     document.getElementById('enlargedImageContainer').style.display = 'none';
