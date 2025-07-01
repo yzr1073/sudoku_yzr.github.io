@@ -150,7 +150,7 @@
             document.getElementById('initialDialog').style.display = 'block';
             document.getElementById('loading').style.display = 'flex';
             const prompts = document.getElementById('prompts').value.split(',').map(prompt => prompt.trim()).filter(prompt => prompt!== '');
-            const response = await fetch('http://localhost:5000/generate', {
+            const response = await fetch('http://192.168.0.181:5000/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -166,7 +166,7 @@
             data.image_files.forEach((file, index) => {
                 const img = document.createElement('img');
                 const fileName = file.split('/').pop();
-                img.src = `http://localhost:5000/image/${fileName}`;
+                img.src = `http://192.168.0.181:5000/image/${fileName}`;
                 img.alt = `Generated Image ${index + 1}`;
 
                 const container = document.createElement('div');
